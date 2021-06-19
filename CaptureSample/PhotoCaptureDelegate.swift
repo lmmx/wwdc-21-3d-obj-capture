@@ -108,16 +108,21 @@ extension PhotoCaptureProcessor: AVCapturePhotoCaptureDelegate {
         // Cache the depth data, if it exists, as a disparity map.
         logger.log("DidFinishProcessingPhoto: photo=\(String(describing: photo))")
         if let depthData = photo.depthData?.converting(toDepthDataType:
-                                                        kCVPixelFormatType_DisparityFloat32),
-           let colorSpace = CGColorSpace(name: CGColorSpace.linearGray) {
-            let depthImage = CIImage( cvImageBuffer: depthData.depthDataMap,
-                                      options: [ .auxiliaryDisparity: true ] )
-            depthMapData = context.tiffRepresentation(of: depthImage,
-                                                      format: .Lf,
-                                                      colorSpace: colorSpace,
-                                                      options: [.disparityImage: depthImage])
+                                                        kCVPixelFormatType_DisparityFloat32) {
+            if let colorSpace = CGColorSpace(name: CGColorSpace.linearGray) {
+                let depthImage = CIImage( cvImageBuffer: depthData.depthDataMap,
+                                          options: [ .auxiliaryDisparity: true ] )
+                depthMapData = context.tiffRepresentation(of: depthImage,
+                                                          format: .Lf,
+                                                          colorSpace: colorSpace,
+                                                          options: [.disparityImage: depthImage])
+            } else {
+                logger.error("colorSpace .linearGray not available... can't save depth data!")
+                depthMapData = nil
+            }
         } else {
-            logger.error("colorSpace .linearGray not available... can't save depth data!")
+            print("depthData is \(photo.depthData)")
+            logger.error("depthData not available... can't save depth data!")
             depthMapData = nil
         }
     }

@@ -540,6 +540,7 @@ class CameraViewModel: ObservableObject {
             // Prefer high resolution and maximum quality, with depth.
             photoOutput.isHighResolutionCaptureEnabled = true
             photoOutput.isDepthDataDeliveryEnabled = photoOutput.isDepthDataDeliverySupported
+            print("isDepthData supported: \(photoOutput.isDepthDataDeliverySupported)")
             photoOutput.maxPhotoQualityPrioritization = .quality
         } else {
             logger.error("Could not add photo output to the session")
@@ -556,6 +557,11 @@ class CameraViewModel: ObservableObject {
                                                           position: .back) {
             logger.log(">>> Got back wide dual camera!")
             defaultVideoDevice = dualCameraDevice
+        } else if let backDualWideCameraDevice = AVCaptureDevice.default(.builtInDualWideCamera,
+                                                                     for: .video,
+                                                                     position: .back) {
+            logger.log(">>> Using dual wide back camera!")
+            defaultVideoDevice = backDualWideCameraDevice
         } else if let backWideCameraDevice = AVCaptureDevice.default(.builtInWideAngleCamera,
                                                                      for: .video,
                                                                      position: .back) {

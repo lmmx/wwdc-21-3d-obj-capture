@@ -551,6 +551,13 @@ class CameraViewModel: ObservableObject {
     /// This method checks for a depth-capable dual rear camera and, if found, returns an `AVCaptureDevice`.
     private func getVideoDeviceForPhotogrammetry() throws -> AVCaptureDevice {
         var defaultVideoDevice: AVCaptureDevice?
+        
+        let discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes:
+                                          [.builtInDualCamera, .builtInDualWideCamera, .builtInUltraWideCamera, .builtInTelephotoCamera, .builtInWideAngleCamera, .builtInTrueDepthCamera, .builtInTripleCamera],
+                                        mediaType: .video, position: .unspecified)
+            for device in discoverySession.devices {
+              print("\(device) supports \(device.activeFormat.supportedDepthDataFormats)")
+            }
 
         // Specify dual camera to get access to depth data.
         if let dualCameraDevice = AVCaptureDevice.default(.builtInDualCamera, for: .video,
